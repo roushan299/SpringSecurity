@@ -3,6 +3,8 @@ package com.security.springsecurity.service;
 import com.security.springsecurity.dto.UserResponse;
 import com.security.springsecurity.entity.User;
 import com.security.springsecurity.enums.Role;
+import com.security.springsecurity.exception.UserAlreadyExits;
+import com.security.springsecurity.exception.UserDoesNotExists;
 import com.security.springsecurity.mapper.UserMapper;
 import com.security.springsecurity.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +36,7 @@ public class UserService implements UserDetailsService {
         Optional<User> optionalUser = userRepository.findByEmail(email);
 
         if(optionalUser.isEmpty()) {
-            throw new UsernameNotFoundException(email);
+            throw new UsernameNotFoundException("User doesn't exits with this email: "+email);
         }
         User user = optionalUser.get();
         UserDetails userDetails = org.springframework.security.core.userdetails.User.builder()
@@ -58,7 +60,7 @@ public class UserService implements UserDetailsService {
 
     public User registerUser(String email, String password, Set<Role> roles, String username ) {
         if(userRepository.existsByEmail(email)) {
-            throw new RuntimeException("User Already Exists");
+            throw new UserAlreadyExits("User already exits with this email: "+email);
         }
 
         User newUser = new User();
@@ -73,7 +75,7 @@ public class UserService implements UserDetailsService {
     public User findUserByEmail(String email) {
         Optional<User> optionalUser = userRepository.findByEmail(email);
         if(optionalUser.isEmpty()) {
-            throw new UsernameNotFoundException(email);
+            throw new UserDoesNotExists("User doesn't exits with this email: "+email);
         }
         return optionalUser.get();
     }
@@ -85,4 +87,5 @@ public class UserService implements UserDetailsService {
         UserResponse userResponse = UserMapper.getUserResponse(user);
         return userResponse;
     }
+
 }

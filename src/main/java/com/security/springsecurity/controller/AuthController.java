@@ -22,22 +22,14 @@ public class AuthController {
 
     @PostMapping("/register")
     private ResponseEntity<AuthenticationResponse> register(@Valid @RequestBody RegisterRequest registerRequest) {
-        try{
             AuthenticationResponse response = authService.register(registerRequest);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        }catch(RuntimeException e){
-            return ResponseEntity.badRequest().build();
-        }
     }
 
     @PostMapping("/login")
     private ResponseEntity<AuthenticationResponse> authenticate(@Valid @RequestBody AuthenticationRequest authenticationRequest) {
-        try{
             AuthenticationResponse response = authService.login(authenticationRequest);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        }catch(RuntimeException e){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
     }
 
 

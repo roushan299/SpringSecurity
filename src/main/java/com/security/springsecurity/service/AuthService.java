@@ -10,6 +10,8 @@ import com.security.springsecurity.mapper.RoleMapper;
 import com.security.springsecurity.security.JwtUtil;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.Set;
 
@@ -22,6 +24,9 @@ public class AuthService {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public AuthenticationResponse register(@Valid RegisterRequest registerRequest) {
         Set<Role> roles = RoleMapper.getRole(registerRequest.getRoles());
         User user = userService.registerUser(registerRequest.getEmail(), registerRequest.getPassword(), roles, registerRequest.getUsername());
@@ -32,6 +37,11 @@ public class AuthService {
 
     public AuthenticationResponse login(@Valid AuthenticationRequest authenticationRequest) {
         User user = userService.findUserByEmail(authenticationRequest.getEmail());
+
+        // need to add password checker
+         if(!passwordEncoder.matches(authenticationRequest.getPassword(), user.getPassword())) {
+            throw new BadCredentialsException("Password Incorrect");
+        }
         String token = jwtUtil.generateToken(authenticationRequest.getEmail(), user.getRole());
 
         AuthenticationResponse authenticationResponse = AuthenticationResponseMapper.getAuthResponse(user, token);
