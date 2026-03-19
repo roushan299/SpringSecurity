@@ -1,0 +1,4 @@
+package com.security.springsecurity.enums;
+
+public enum Role {
+}
